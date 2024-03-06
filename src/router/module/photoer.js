@@ -4,7 +4,7 @@ export default [
     name: 'photoer',
     component: () => import('@/views/photoer/index.vue'),
     meta: {
-      title: '摄影师详情'
+      title: '测试'
     }
   }
 ]

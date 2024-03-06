@@ -1,9 +1,10 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-const modules = import.meta.glob('./module/*.js')
+const modules = import.meta.glob('./module/*.js',{ eager: true })
+console.log(modules);
 
 const routeArray = []
 for (const key in modules) {
-  const item = await modules[key]()
+  const item = modules[key]
   routeArray.push(...item.default)
 }
 
@@ -23,7 +24,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  window.document.title = to.meta.title || '洛邑古城'
+  window.document.title = to.meta.title || '测试'
   next()
 })
 
