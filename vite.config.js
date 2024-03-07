@@ -9,12 +9,17 @@ import autoprefixer from 'autoprefixer'
 import Components from 'unplugin-vue-components/vite'
 import { VantResolver } from 'unplugin-vue-components/resolvers'
 
+import leagcy from "@vitejs/plugin-legacy"
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     Components({
       resolvers: [VantResolver()]
+    }),
+    leagcy({
+      targets:['Android >= 7', 'chrome < 60', 'edge < 15','last 2 versions']
     })
   ],
   resolve: {
