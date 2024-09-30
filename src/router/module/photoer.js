@@ -4,7 +4,7 @@ export default [
     name: 'photoer',
     component: () => import('@/views/photoer/index.vue'),
     meta: {
-      title: '测试'
+      title: '事件动态绑定'
     }
   }
 ]
