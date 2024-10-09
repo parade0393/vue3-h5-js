@@ -71,19 +71,19 @@ const onChange = (fieldName) => {
       }
     })
   }
-  validateAllFields()
+  // validateAllFields()
 }
 
 // 监听表单数据变化
-watch(
-  formData,
-  () => {
-    console.log('watch formData')
+// watch(
+//   formData,
+//   () => {
+//     console.log('watch formData')
 
-    validateAllFields()
-  },
-  { deep: true }
-)
+//     validateAllFields()
+//   },
+//   { deep: true }
+// )
 
 // 监听配置变化
 watch(
