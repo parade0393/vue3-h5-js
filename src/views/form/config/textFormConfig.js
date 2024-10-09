@@ -1,14 +1,20 @@
+// import {fileUploadApi} from "@/api/common"
 /**
  * name:表单字段
  * label:表单项名称
  * type:表单类型
- * props:vant组件支持的props
+ * props:vant组件支持的props,
+ * childProps:直接子组件的props
+ * nestChildProps:嵌套子组件的props 比如checkbox-group,van-checkbox-group使用childProps,van-checkbox使用nestChildProps
  * show:是否是隐藏字段，如果有visible配置且返回值为false的话，show将失去意义
  * dependencies:用来配置关联字段，参数是当前值和当年表单的数据
  * rules：校验规则，validate的参数是当前值和当年表单的数据,也支持vant的其他校验规则
  * events:事件，前两个参数是当前value和整改表单的数据，后面的参数有事件对象和框架传递的参数
  * listenChange:是否监听v-model的改变，如果为true，则会根据dependencies来做响应的处理
  * dependencies：依赖该字段的所有字段
+ *
+ * formatType:时间选择器会用到,控件提供的数据格式是区间时,默认值以,分格
+ * 使用calendar时注意有默认minDate和maxDate
  */
 export const formConfig = [
     {
@@ -24,7 +30,7 @@ export const formConfig = [
       ],
       events:{
         focus:(value,formData,event)=>{
-          console.log("name,focus",formData,event);
+          console.log("name,focus",value,formData,event);
 
         }
       }
@@ -39,7 +45,7 @@ export const formConfig = [
       props:{type:"digit",},
       events:{
         focus:(value,formData,event)=>{
-          console.log(value,formData,event);
+          console.log("name,focus",value,formData,event);
 
         }
       }
@@ -50,7 +56,7 @@ export const formConfig = [
       show:true,
       type: 'radio-group',
       placeholder: '请选择性别',
-      props: {
+      childProps: {
         direction: 'horizontal',
       },
       options: [
@@ -67,7 +73,7 @@ export const formConfig = [
       show:true,
       label: '婚姻状况',
       type: 'radio-group',
-      props: {
+      childProps: {
         direction: 'horizontal',
       },
       placeholder: '请选择婚姻状况',
@@ -106,7 +112,7 @@ export const formConfig = [
       label:"是否开启",
       show:true,
       type:"switch",
-      props:{size:"6vw"}
+      childProps:{size:"6vw"}
     },
     {
       name:"transfer",
@@ -121,7 +127,7 @@ export const formConfig = [
       type:"stepper",
       show:true,
       defaultValue:0,
-      props:{
+      childProps:{
         min:0
       }
     },
@@ -144,7 +150,7 @@ export const formConfig = [
         show:true,
         label: '兴趣爱好',
         type: 'checkbox-group',
-        props: {
+        childProps: {
           direction: 'horizontal',
         },
         options: [
@@ -157,16 +163,117 @@ export const formConfig = [
         ],
       },
       {
-        name:'city',
-        label:"选择器",
-        type:"picker",
+        name:"file",
+        type:"file",
+        label:"文件上传",
         show:true,
-        options:[
-          { text: '杭州', value: 'Hangzhou' },
-          { text: '宁波', value: 'Ningbo' },
-          { text: '温州', value: 'Wenzhou' },
-          { text: '绍兴', value: 'Shaoxing' },
-          { text: '湖州', value: 'Huzhou' },
+        uploadApi:()=>{},
+        defaultValue:[],
+        handlerResponse:(res)=>{return res.data[0]},
+        rules:[
+          {validator:value => value.length>0 ,message:"请上传附件"}
         ]
+      },
+      {
+        name:"picker",
+        type:"picker",
+        label:"请选择类型",
+        placeholder:"请选择城市",
+        show:true,
+        props:{
+          "is-link":true,
+          "readonly":true,
+          "input-align":"right"
+        },
+        childProps:{
+          "position":"bottom"
+        },
+        nestChildProps:{
+          "default-index":2
+        },
+        defaultValue:"温州",
+        rules: [
+          { validator: value => !!value, message: '请选择lei' },
+        ],
+        options:['杭州', '宁波', '温州', '嘉兴', '湖州']
+      },
+      {
+        name:"pickerTime",
+        type:"picker",
+        label:"多列选择",
+        placeholder:"请选择城市",
+        show:true,
+        props:{
+          "is-link":true,
+          "readonly":true,
+        },
+        childProps:{
+          "position":"bottom"
+        },
+        defaultValue:"周三,下午",//是个字符串
+        options:[
+          // 第一列
+          {
+            values: ['周一', '周二', '周三', '周四', '周五'],
+            defaultIndex: 2,
+          },
+          // 第二列
+          {
+            values: ['上午', '下午', '晚上'],
+            defaultIndex: 1,
+          },
+        ]
+      },
+      {
+        name:"startTime",
+        label:"开始时间",
+        type:"dateTime",
+        props:{
+          "is-link":true,
+          "readonly":true,
+        },
+        childProps:{
+          position:"bottom"
+        },
+        nestChildProps:{
+          type:"date"
+        },
+        show:true,
+        defaultValue:"2023-11-12",
+        placeholder:"请选择开始时间",
+        formatType:"YYYY-MM-DD",
+        rules: [
+          { validator: value => !!value, message: '请选择开始时间' },
+        ],
+      },
+      {
+        name:"endTime",
+        label:"请选择结束日期",
+        type:"calendar",
+        show:true,
+        placeholder:"请选择结束日期",
+        formatType:"YYYY-MM-DD",
+        defaultValue:"2024-10-12",
+        props:{
+          "is-link":true,
+          "readonly":true,
+        }
+      },
+      {
+        name:"bet",
+        label:"请选择日期区间",
+        type:"calendar",
+        show:true,
+        placeholder:"请选择开始日期至结束日期",
+        props:{
+          "is-link":true,
+          "readonly":true,
+        },
+        childProps:{
+          type:"range"
+        },
+        defaultValue:"2024-10-12至2024-11-13",
+        formatType:"YYYY-MM-DD",
+        "range-separator":"至"
       }
   ];

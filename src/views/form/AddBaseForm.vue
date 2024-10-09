@@ -1,6 +1,10 @@
 <script setup>
 import { ref, watch, computed, reactive } from 'vue'
 import { trueValue } from '@/util/common.js'
+import FileAdd from './FileAdd.vue'
+import PopPickerField from './PopPickerField.vue'
+import PopPickerDateTime from './PopPickerDateTime.vue'
+import PopPickerCalendar from './PopPickerCalendar.vue'
 const props = defineProps({
   config: {
     type: Object,
@@ -162,26 +166,54 @@ const onSubmit = () => {
         v-on="generateEventHandlers(field)"
       />
 
+      <!-- 时间选择 -->
+      <pop-picker-date-time
+        :rules="[{ validator: (val) => validateField(field, val) }]"
+        v-else-if="field.type === 'dateTime'"
+        :field="field"
+        v-model="formData[field.name]"
+        v-show="field.show"
+      />
+
+      <!-- 上传附件 -->
+      <pop-picker-field
+        :rules="[{ validator: (val) => validateField(field, val) }]"
+        v-else-if="field.type === 'picker'"
+        :field="field"
+        v-model="formData[field.name]"
+        v-show="field.show"
+      />
+
+      <!-- 日历 -->
+      <pop-picker-calendar
+        :rules="[{ validator: (val) => validateField(field, val) }]"
+        v-else-if="field.type === 'calendar'"
+        :field="field"
+        v-model="formData[field.name]"
+        v-show="field.show"
+      />
+
       <van-field
         v-else
         v-show="field.show"
         :label="field.label"
         :placeholder="field.placeholder"
         :rules="[{ validator: (val) => validateField(field, val) }]"
+        v-bind="field.props"
         :type="field.type"
       >
         <!-- 单选 -->
         <template #input v-if="field.type === 'radio-group'">
           <van-radio-group
             v-model="formData[field.name]"
-            v-bind="field.props"
             v-on="generateEventHandlers(field)"
+            v-bind="field.childProps"
           >
             <van-radio
               v-for="option in field.options"
               :key="option.name"
               :name="option.value"
-              v-bind="option.props"
+              v-bind="option.nestChildProps"
             >
               {{ option.label }}
             </van-radio>
@@ -191,8 +223,8 @@ const onSubmit = () => {
         <template #input v-else-if="field.type === 'checkbox-group'">
           <van-checkbox-group
             v-model="formData[field.name]"
-            v-bind="field.props"
             v-on="field.listenChange ? { 'update:modelValue': () => onChange(field.name) } : {}"
+            v-bind="field.childProps"
           >
             <van-checkbox
               v-for="option in field.options"
@@ -208,32 +240,32 @@ const onSubmit = () => {
         <template #input v-else-if="field.type === 'checkbox'">
           <van-checkbox
             v-model="formData[field.name]"
-            v-bind="field.props"
             v-on="field.listenChange ? { 'update:modelValue': () => onChange(field.name) } : {}"
+            v-bind="field.childProps"
           />
         </template>
         <!-- 开关 -->
         <template #input v-else-if="field.type == 'switch'">
           <van-switch
             v-model="formData[field.name]"
-            v-bind="field.props"
             v-on="field.listenChange ? { 'update:modelValue': () => onChange(field.name) } : {}"
+            v-bind="field.childProps"
           />
         </template>
         <!-- 步进器 -->
         <template #input v-else-if="field.type == 'stepper'">
           <van-stepper
             v-model="formData[field.name]"
-            v-bind="field.props"
             v-on="field.listenChange ? { 'update:modelValue': () => onChange(field.name) } : {}"
+            v-bind="field.childProps"
           />
         </template>
         <!-- 评分 -->
         <template #input v-else-if="field.type == 'rate'">
           <van-rate
             v-model="formData[field.name]"
-            v-bind="field.props"
             v-on="field.listenChange ? { 'update:modelValue': () => onChange(field.name) } : {}"
+            v-bind="field.childProps"
           />
         </template>
         <!-- 滑块 -->
@@ -241,8 +273,18 @@ const onSubmit = () => {
           <slot name="slider" :field="field" :formData="formData" :onChange="onChange">
             <van-slider
               v-model="formData[field.name]"
-              v-bind="field.props"
+              v-bind="field.childProps"
               v-on="field.listenChange ? { 'update:modelValue': () => onChange(field.name) } : {}"
+            />
+          </slot>
+        </template>
+        <template #input v-else-if="field.type === 'file'">
+          <slot :name="field.type" :field="field" :formData="formData" :onChange="onChange">
+            <file-add
+              :field="field"
+              v-model="formData[field.name]"
+              :uploadApi="field.uploadApi"
+              :handlerResponse="field.handlerResponse"
             />
           </slot>
         </template>
@@ -251,10 +293,13 @@ const onSubmit = () => {
         </template>
       </van-field>
     </template>
+
     <div style="margin: 16px">
-      <van-button round block type="primary" native-type="submit">提交</van-button>
+      <slot name="submit">
+        <van-button round block type="primary" native-type="submit">提交</van-button>
+      </slot>
     </div>
   </van-form>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="less" scoped></style>

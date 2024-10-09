@@ -1,8 +1,8 @@
 <script setup>
-import AddBaseForm from './AddBaseForm.vue';
-import { formConfig } from './config/textFormConfig';
+import AddBaseForm from './AddBaseForm.vue'
+import { formConfig } from './config/textFormConfig'
 
-const onSubmit = (value) => {};
+const onSubmit = () => {}
 </script>
 
 <template>
@@ -17,4 +17,4 @@ const onSubmit = (value) => {};
   </AddBaseForm>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="less" scoped></style>
