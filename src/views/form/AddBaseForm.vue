@@ -9,23 +9,49 @@ const props = defineProps({
   config: {
     type: Object,
     required: true
+  },
+  flowConfig: {
+    type: Object,
+    default: function () {
+      return {}
+    }
   }
 })
+
 const emits = defineEmits(['onSubimitComplete'])
 
 const formConfig = ref(props.config)
 const formData = reactive({})
 const formErrors = reactive({})
 
+// 处理字段变化
+const onChange = (fieldName) => {
+  const changedField = formConfig.value.find((field) => field.name === fieldName)
+  if (changedField && changedField.dependencies) {
+    changedField.dependencies.forEach(async (dep) => {
+      const depField = formConfig.value.find((field) => field.name === dep.field)
+      if (depField) {
+        formData[dep.field] = await dep.getValue(formData[fieldName], formData)
+      }
+    })
+  }
+  // validateAllFields();
+}
+
 // 初始化表单数据
 formConfig.value.forEach((field) => {
-  formData[field.name] = trueValue(field.defaultValue)
+  const initValue = trueValue(field.defaultValue)
+
+  formData[field.name] = initValue
+  // 初始值字段变化
+  if (initValue && field.listenChange) {
+    onChange(field.name)
+  }
 })
 
 // 计算可见字段,field.visible返回值发生改变后，会重新计算
 const visibleFields = computed(() => {
   return formConfig.value.filter((field) => {
-    console.log('visibleFields')
     if (typeof field.visible === 'function') {
       return field.visible(formData)
     }
@@ -35,8 +61,6 @@ const visibleFields = computed(() => {
 
 // 验证单个字段
 const validateField = (field, value) => {
-  console.log('validateField')
-
   if (field.rules) {
     for (let rule of field.rules) {
       if (!rule.validator(value, formData)) {
@@ -51,54 +75,42 @@ const validateField = (field, value) => {
 
 // 验证所有可见字段
 const validateAllFields = () => {
-  console.log('validateAllFields')
-
   visibleFields.value.forEach((field) => {
     validateField(field, formData[field.name])
   })
-}
-
-// 处理字段变化
-const onChange = (fieldName) => {
-  console.log('onChange')
-
-  const changedField = formConfig.value.find((field) => field.name === fieldName)
-  if (changedField && changedField.dependencies) {
-    changedField.dependencies.forEach((dep) => {
-      const depField = formConfig.value.find((field) => field.name === dep.field)
-      if (depField) {
-        formData[dep.field] = dep.getValue(formData[fieldName], formData)
-      }
-    })
-  }
-  // validateAllFields()
 }
 
 // 监听表单数据变化
 // watch(
 //   formData,
 //   () => {
-//     console.log('watch formData')
+//     console.log('watch formData');
 
-//     validateAllFields()
+//     // validateAllFields();
 //   },
 //   { deep: true }
-// )
+// );
 
 // 监听配置变化
 watch(
   () => props.config,
   (newConfig) => {
-    console.log('props config')
-
     formConfig.value = newConfig
     // 更新表单数据，保留已有值
     newConfig.forEach((field) => {
       if (!(field.name in formData)) {
-        formData[field.name] = trueValue(field.defaultValue)
+        const initValue = trueValue(field.defaultValue)
+
+        formData[field.name] = initValue
+        if (initValue && field.listenChange) {
+          onChange(field.name)
+        }
       }
     })
     validateAllFields()
+  },
+  {
+    immediate: true
   }
 )
 
@@ -125,10 +137,12 @@ const generateEventHandlers = (field) => {
 const createHandler = (handler, eventField) => {
   return (...args) => {
     const field = visibleFields.value.find((f) => f.name === eventField.name)
+
     if (field && field.show) {
       const currentValue = formData[field.name]
       handler.call(this, currentValue, formData, args)
     }
+
     if (eventField.listenChange) {
       handler.call(this, eventField.name)
     }
@@ -146,8 +160,8 @@ const onSubmit = () => {
   visibleFields.value.forEach((el) => {
     submitValue[el.name] = formData[el.name]
   })
-  console.log(submitValue)
-  emits('onSubimitComplete', submitValue)
+
+  emits('onSubimitComplete', { formData: submitValue })
 }
 </script>
 

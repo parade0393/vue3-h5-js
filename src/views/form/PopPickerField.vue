@@ -1,4 +1,5 @@
 <script setup>
+import { watch } from 'vue'
 import { ref, computed } from 'vue'
 
 defineOptions({
@@ -41,6 +42,53 @@ const onConfirm = (value) => {
 const showPick = () => {
   showPicker.value = true
 }
+const pickerValue = ref()
+
+const initPickValue = (value, element, arr) => {
+  const op = value.find((el) => el.text == element)
+  if (op) {
+    arr.push(op.value)
+    if (op.children) {
+      initPickValue(op.children, element, arr)
+    }
+  } else {
+    for (const child of value) {
+      if (child.children) {
+        initPickValue(child.children, element, arr)
+      }
+    }
+  }
+}
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    const arr = []
+    if (newValue) {
+      if (props.field.options.length > 0) {
+        if (Array.isArray(props.field.options[0])) {
+          //多列选择
+          for (const element of newValue.split(',')) {
+            for (const nestItem of props.field.options) {
+              const op = nestItem.find((el) => el.text == element)
+              if (op) {
+                arr.push(op.value)
+              }
+            }
+          }
+        } else {
+          for (const element of newValue.split(',')) {
+            initPickValue(props.field.options, element, arr)
+          }
+        }
+      }
+    }
+    pickerValue.value = arr
+  },
+  {
+    immediate: true
+  }
+)
 </script>
 
 <template>
@@ -57,6 +105,7 @@ const showPick = () => {
     />
     <van-popup v-model:show="showPicker" v-bind="field.childProps">
       <van-picker
+        v-model="pickerValue"
         :title="field.label"
         :columns="field.options"
         @confirm="onConfirm"

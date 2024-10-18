@@ -188,14 +188,114 @@ export const formConfig = [
         childProps:{
           "position":"bottom"
         },
-        nestChildProps:{
-          "default-index":2
-        },
         defaultValue:"温州",
         rules: [
           { validator: value => !!value, message: '请选择lei' },
         ],
-        options:['杭州', '宁波', '温州', '嘉兴', '湖州']
+        options:[ { text: '杭州', value: 'Hangzhou' },
+          { text: '宁波', value: 'Ningbo' },
+          { text: '温州', value: 'Wenzhou' },
+          { text: '绍兴', value: 'Shaoxing' },
+          { text: '湖州', value: 'Huzhou' },]
+      },
+      {
+        name:"picker2",
+        type:"picker",
+        label:"多列选择",
+        placeholder:"请选择城市",
+        show:true,
+        props:{
+          "is-link":true,
+          "readonly":true,
+          "input-align":"right"
+        },
+        childProps:{
+          "position":"bottom"
+        },
+        defaultValue:"周三,下午",
+        rules: [
+          { validator: value => !!value, message: '请选择lei' },
+        ],
+        options:[  // 第一列
+          [
+            { text: '周一', value: 'Monday' },
+            { text: '周二', value: 'Tuesday' },
+            { text: '周三', value: 'Wednesday' },
+            { text: '周四', value: 'Thursday' },
+            { text: '周五', value: 'Friday' },
+          ],
+          // 第二列
+          [
+            { text: '上午', value: 'Morning' },
+            { text: '下午', value: 'Afternoon' },
+            { text: '晚上', value: 'Evening' },
+          ],]
+      },
+      {
+        name:"picker1",
+        type:"picker",
+        label:"picker级联选择",
+        placeholder:"请选择城市",
+        show:true,
+        props:{
+          "is-link":true,
+          "readonly":true,
+          "input-align":"right"
+        },
+        childProps:{
+          "position":"bottom"
+        },
+        nestChildProps:{
+          "default-index":2
+        },
+        defaultValue:"浙江,温州,鹿城区",
+        rules: [
+          { validator: value => !!value, message: '请选择lei' },
+        ],
+        options:[{
+          text: '浙江',
+          value: 'Zhejiang',
+          children: [
+            {
+              text: '杭州',
+              value: 'Hangzhou',
+              children: [
+                { text: '西湖区', value: 'Xihu' },
+                { text: '余杭区', value: 'Yuhang' },
+              ],
+            },
+            {
+              text: '温州',
+              value: 'Wenzhou',
+              children: [
+                { text: '鹿城区', value: 'Lucheng' },
+                { text: '瓯海区', value: 'Ouhai' },
+              ],
+            },
+          ],
+        },
+        {
+          text: '福建',
+          value: 'Fujian',
+          children: [
+            {
+              text: '福州',
+              value: 'Fuzhou',
+              children: [
+                { text: '鼓楼区', value: 'Gulou' },
+                { text: '台江区', value: 'Taijiang' },
+              ],
+            },
+            {
+              text: '厦门',
+              value: 'Xiamen',
+              children: [
+                { text: '思明区', value: 'Siming' },
+                { text: '海沧区', value: 'Haicang' },
+              ],
+            },
+          ],
+        },]
       },
       {
         name:"pickerTime",

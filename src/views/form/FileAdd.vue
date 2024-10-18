@@ -24,7 +24,17 @@ const emit = defineEmits(['update:modelValue'])
 
 const fileList = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => {
+    if (value.length > 0) {
+      if (value[0].status == 'failed') {
+        emit('update:modelValue', [])
+      } else {
+        emit('update:modelValue', value)
+      }
+    } else {
+      emit('update:modelValue', [])
+    }
+  }
 })
 
 const uploadImageToServer = (file) => {

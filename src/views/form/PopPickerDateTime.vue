@@ -25,20 +25,47 @@ const emit = defineEmits(['update:modelValue'])
 
 //当前选择的日期
 // const currentDate = ref();
-const currentDate = computed(() => {
-  if (props.modelValue) {
-    return dayjs(props.modelValue).toDate()
-  } else {
-    return new Date()
-  }
-})
+// const currentDate = computed(() => {
+//   if (props.modelValue) {
+//     return dayjs(props.modelValue).toDate()
+//   } else {
+//     return new Date()
+//   }
+// })
+
+// 格式化日期的工具函数
+const formatFiledValue = (date) => {
+  return dayjs(date).format(props.field.formatType)
+}
+
+const formatDate = (date) => {
+  return dayjs(date ? date : new Date())
+    .format('YYYY-MM-DD')
+    .split('-')
+}
+
+const currentDate = ref(formatDate(props.modelValue))
+
+// 使用watch来监听modelValue的变化，更新currentDate
+// watch(
+//   () => props.modelValue,
+//   (newValue) => {
+//     currentDate.value = formatDate(newValue)
+//   }
+// )
 
 const fieldValue = computed({
   get: () => {
     if (props.modelValue) {
-      return dayjs(props.modelValue).format(props.field.formatType)
+      return formatFiledValue(props.modelValue)
     } else {
-      return dayjs().format(props.field.formatType)
+      // 如果没有初始值，使用当前日期
+      const initValue = formatFiledValue(currentDate.value)
+      // 确保只在组件初始化时触发一次
+      if (!props.modelValue) {
+        emit('update:modelValue', initValue)
+      }
+      return initValue
     }
   },
   set: (value) => emit('update:modelValue', value)
@@ -52,6 +79,7 @@ const onConfirm = (value) => {
   } else {
     fieldValue.value = value
   }
+  fieldValue.value = formatFiledValue(value.selectedValues)
 
   showPicker.value = false
 }
