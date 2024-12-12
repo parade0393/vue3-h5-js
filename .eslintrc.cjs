@@ -19,10 +19,10 @@ module.exports = {
     semi: 0, // 禁止尾部使用分号
     "no-debugger": "warn", // 禁止出现 debugger
     'vue/multi-word-component-names': [//vue组件名称必须使用多单词
-      'error',
+      'warn',
       {
         ignores: ['Index', 'Header']//允许的组件名称
       }
-    ]
+    ],
   },
 }
