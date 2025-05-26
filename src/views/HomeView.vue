@@ -3,7 +3,11 @@ import {useRouter} from "vue-router"
 import {computed} from "vue"
 const router = useRouter()
 const routeList = computed(()=>{
-  return router.options.routes.filter(el => el.path !== "/")
+  return router.options.routes.filter(el => {
+    console.log(el.meta?.showIndex)
+    const showIndex = el.meta?.showIndex === undefined || el.meta?.showIndex
+    return el.path !== "/" && showIndex
+  })
 })
 </script>
 
