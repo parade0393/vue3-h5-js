@@ -1,10 +1,11 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { useKeepAlive } from '@/hooks/useKeepAlive'
+// import { useKeepAlive } from '@/hooks/useKeepAlive'
+import {useNavigation} from "@/hooks/useNavigation"
 import { useRouter } from 'vue-router'
 import { watch } from 'vue'
 
-const { keepAliveComponents, handleRouteChange } = useKeepAlive()
+const { keepAliveComponents, handleRouteChange } = useNavigation()
 const router = useRouter()
 
 // 监听路由变化

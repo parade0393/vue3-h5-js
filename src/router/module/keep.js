@@ -5,7 +5,6 @@ export default[
         component: () => import('@/views/keep/index.vue'),
         meta: {
             title: 'KeepAlive',
-            depth:1,
         },
     },
     {
@@ -15,9 +14,9 @@ export default[
         meta: {
             title: 'KeepAlive-Form',
             keepAlive: true,
+            resetOnEnter: true, // 进入时重置
             showIndex: false,
-            depth:2,
-            // clearOnBack: true // 返回到更浅层级时清除缓存
+            exceptFrom: ['keepSelect'], // 进入时不清除缓存
         },
     },
     {
@@ -27,7 +26,6 @@ export default[
         meta: {
             title: 'KeepAlive-Select',
             showIndex: false,
-            depth:3,
         },
     }
 ]
